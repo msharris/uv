@@ -30,19 +30,19 @@ func (loc Location) String() string {
 func main() {
 	resp, err := http.Get("https://uvdata.arpansa.gov.au/xml/uvvalues.xml")
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("ARPANSA data file unavailable")
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Unable to read ARPANSA data file")
 	}
 
 	var stations Stations
 	err = xml.Unmarshal(body, &stations)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Unexpected format of ARPANSA data file")
 	}
 
 	for _, loc := range stations.Locations {
