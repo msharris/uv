@@ -14,6 +14,7 @@ type Options struct {
 	Locations []string
 	Sort      Field
 	Reverse   bool
+	Quiet     bool
 }
 
 type Field string
@@ -89,7 +90,7 @@ func Run(options Options) error {
 		slices.Reverse(stations)
 	}
 
-	show(stations)
+	show(stations, options.Quiet)
 
 	return nil
 }
@@ -146,15 +147,21 @@ func sort(stations []Station, f Field) {
 	}
 }
 
-func show(stations []Station) {
+func show(stations []Station, quiet bool) {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-	fmt.Fprintln(w, fmt.Sprintf("%v\t%v\t%v\t%v\t%v\t", "Id", "Location", "Index", "Time", "Status"))
-	for _, s := range stations {
-		status := "-"
-		if !s.Available {
-			status = "n/a"
+	if quiet {
+		for _, s := range stations {
+			fmt.Fprintln(w, fmt.Sprintf("%v\t%.1f\t", s.Name, s.UVIndex))
 		}
-		fmt.Fprintln(w, fmt.Sprintf("%v\t%v\t%.1f\t%v\t%v\t", s.Id, s.Name, s.UVIndex, s.Time.Format("15:04"), status))
+	} else {
+		fmt.Fprintln(w, fmt.Sprintf("%v\t%v\t%v\t%v\t%v\t", "Id", "Location", "Index", "Time", "Status"))
+		for _, s := range stations {
+			status := "-"
+			if !s.Available {
+				status = "n/a"
+			}
+			fmt.Fprintln(w, fmt.Sprintf("%v\t%v\t%.1f\t%v\t%v\t", s.Id, s.Name, s.UVIndex, s.Time.Format("15:04"), status))
+		}
 	}
 	w.Flush()
 }

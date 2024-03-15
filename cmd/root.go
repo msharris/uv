@@ -32,4 +32,5 @@ func init() {
 	rootCmd.Flags().StringSliceVarP(&flags.Locations, "locations", "l", nil, "comma-separated list of locations to display (accepts id and name)")
 	rootCmd.Flags().VarP(&flags.Sort, "sort", "s", "field to sort observations by")
 	rootCmd.Flags().BoolVarP(&flags.Reverse, "reverse", "r", false, "print observations in reverse order")
+	rootCmd.Flags().BoolVarP(&flags.Quiet, "quiet", "q", false, "reduce the output")
 }
