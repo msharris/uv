@@ -12,8 +12,8 @@ var rootCmd = &cobra.Command{
 	Short: "Shows the current UV index for various locations around Australia",
 	Long: `uv is an app that shows the current UV index for various locations around Australia.
 UV observations are sourced from the ARPANSA API.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		app.Run()
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return app.Run(flags)
 	},
 }
 
@@ -25,6 +25,10 @@ func Execute() {
 	}
 }
 
+var flags = app.Options{}
+
 func init() {
-	// Flags will go here
+	rootCmd.Flags().StringSliceVarP(&flags.Locations, "locations", "l", nil, "a comma-separated list of locations to display")
+	//rootCmd.Flags().StringVarP(&flags.Sort, "sort", "s", "name", "field to sort the observations by")
+	rootCmd.Flags().BoolVarP(&flags.Reverse, "reverse", "r", false, "print the observations in reverse order")
 }
