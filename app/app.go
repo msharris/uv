@@ -36,12 +36,14 @@ func (f *Field) Set(s string) error {
 	switch s {
 	case "id", "name", "index", "time", "status":
 		*f = Field(s)
+	case "location":
+		*f = Name
 	case "uv":
 		*f = UVIndex
 	case "date":
 		*f = Time
 	default:
-		return errors.New(`must be one of "id", "name", "index", "uv", "time", "date", "status"`)
+		return errors.New(`must be one of "id", "name", "location", index", "uv", "time", "date", "status"`)
 	}
 	return nil
 }

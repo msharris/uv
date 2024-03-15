@@ -10,8 +10,9 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "uv",
 	Short: "Shows the current UV index for various locations around Australia",
-	Long: `uv is an app that shows the current UV index for various locations around Australia.
-UV observations are sourced from the ARPANSA API.`,
+	Long: `Shows the current UV index for various locations around Australia.
+Observations are sourced from ARPANSA.
+See disclaimer: https://www.arpansa.gov.au/our-services/monitoring/ultraviolet-radiation-monitoring/ultraviolet-radation-data-information#Disclaimer`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return app.Run(flags)
 	},
@@ -28,7 +29,7 @@ func Execute() {
 var flags = app.Options{Sort: app.Name}
 
 func init() {
-	rootCmd.Flags().StringSliceVarP(&flags.Locations, "locations", "l", nil, "a comma-separated list of locations to display")
-	rootCmd.Flags().VarP(&flags.Sort, "sort", "s", "field to sort the observations by")
-	rootCmd.Flags().BoolVarP(&flags.Reverse, "reverse", "r", false, "print the observations in reverse order")
+	rootCmd.Flags().StringSliceVarP(&flags.Locations, "locations", "l", nil, "comma-separated list of locations to display (accepts id and name)")
+	rootCmd.Flags().VarP(&flags.Sort, "sort", "s", "field to sort observations by")
+	rootCmd.Flags().BoolVarP(&flags.Reverse, "reverse", "r", false, "print observations in reverse order")
 }
