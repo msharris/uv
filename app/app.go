@@ -59,15 +59,16 @@ type Station struct {
 	UVIndex   float64
 	Time      time.Time
 	Available bool
+	Status    string
 }
 
 // For debugging
 func (s Station) String() string {
-	available := "-"
-	if !s.Available {
-		available = "n/a"
+	status := s.Status
+	if s.Available {
+		status = "-"
 	}
-	return fmt.Sprintf("%-5v%-18v%-5.1f%-7v%-v", s.Id, s.Name, s.UVIndex, s.Time.Format("15:04"), available)
+	return fmt.Sprintf("%-5v%-18v%-5.1f%-7v%-v", s.Id, s.Name, s.UVIndex, s.Time.Format("15:04"), status)
 }
 
 func Run(options Options) error {
@@ -142,6 +143,9 @@ func sort(stations []Station, f Field) {
 			if s2.Available {
 				a2 = 1
 			}
+			if a1-a2 == 0 {
+				return strings.Compare(s1.Status, s2.Status)
+			}
 			return a1 - a2
 		})
 	}
@@ -151,14 +155,18 @@ func show(stations []Station, quiet bool) {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 	if quiet {
 		for _, s := range stations {
-			fmt.Fprintln(w, fmt.Sprintf("%v\t%.1f\t", s.Name, s.UVIndex))
+			status := s.Status
+			if !s.Available {
+				status = "(" + status + ")"
+			}
+			fmt.Fprintln(w, fmt.Sprintf("%v\t%.1f\t%v\t", s.Name, s.UVIndex, status))
 		}
 	} else {
 		fmt.Fprintln(w, fmt.Sprintf("%v\t%v\t%v\t%v\t%v\t", "Id", "Location", "Index", "Time", "Status"))
 		for _, s := range stations {
-			status := "-"
-			if !s.Available {
-				status = "n/a"
+			status := s.Status
+			if s.Available {
+				status = "-"
 			}
 			fmt.Fprintln(w, fmt.Sprintf("%v\t%v\t%.1f\t%v\t%v\t", s.Id, s.Name, s.UVIndex, s.Time.Format("15:04"), status))
 		}

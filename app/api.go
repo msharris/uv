@@ -71,6 +71,10 @@ func (xmlLoc *XMLLocation) Station() Station {
 		station.Time = station.Time.In(loc)
 	}
 
+	if xmlLoc.Status != "ok" {
+		station.Status = xmlLoc.Status
+	}
+
 	return station
 }
 
