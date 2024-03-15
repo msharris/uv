@@ -77,6 +77,10 @@ func Run(options Options) error {
 		stations = filter(stations, options.Locations)
 	}
 
+	if len(stations) == 0 {
+		return nil
+	}
+
 	sort(stations, options.Sort)
 
 	if options.Reverse {
