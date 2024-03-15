@@ -1,6 +1,7 @@
 package app
 
 import (
+	"errors"
 	"fmt"
 	"slices"
 	"strings"
@@ -9,8 +10,42 @@ import (
 
 type Options struct {
 	Locations []string
-	Sort      string
+	Sort      Field
 	Reverse   bool
+}
+
+type Field string
+
+const (
+	Id        Field = "id"
+	Name      Field = "name"
+	UVIndex   Field = "index"
+	Time      Field = "time"
+	Available Field = "status"
+)
+
+// Implement pflag.Value interface on Field for Cobra
+func (f *Field) String() string {
+	return string(*f)
+}
+
+func (f *Field) Set(s string) error {
+	s = strings.ToLower(s)
+	switch s {
+	case "id", "name", "index", "time", "status":
+		*f = Field(s)
+	case "uv":
+		*f = UVIndex
+	case "date":
+		*f = Time
+	default:
+		return errors.New(`must be one of "id", "name", "index", "uv", "time", "date", "status"`)
+	}
+	return nil
+}
+
+func (f *Field) Type() string {
+	return "field"
 }
 
 type Station struct {
@@ -35,6 +70,8 @@ func Run(options Options) error {
 		stations = filter(stations, options.Locations)
 	}
 
+	sort(stations, options.Sort)
+
 	if options.Reverse {
 		slices.Reverse(stations)
 	}
@@ -58,4 +95,42 @@ func filter(stations []Station, names []string) []Station {
 		}
 	}
 	return filtered
+}
+
+func sort(stations []Station, f Field) {
+	switch f {
+	case Id:
+		slices.SortFunc(stations, func(s1, s2 Station) int {
+			return strings.Compare(s1.Id, s2.Id)
+		})
+	case Name:
+		slices.SortFunc(stations, func(s1, s2 Station) int {
+			return strings.Compare(s1.Name, s2.Name)
+		})
+	case UVIndex:
+		slices.SortFunc(stations, func(s1, s2 Station) int {
+			if s1.UVIndex < s2.UVIndex {
+				return -1
+			} else if s1.UVIndex > s2.UVIndex {
+				return 1
+			} else {
+				return 0
+			}
+		})
+	case Time:
+		slices.SortFunc(stations, func(s1, s2 Station) int {
+			return s1.Time.Compare(s2.Time)
+		})
+	case Available:
+		slices.SortFunc(stations, func(s1, s2 Station) int {
+			a1, a2 := 0, 0
+			if s1.Available {
+				a1 = 1
+			}
+			if s2.Available {
+				a2 = 1
+			}
+			return a1 - a2
+		})
+	}
 }

@@ -25,10 +25,10 @@ func Execute() {
 	}
 }
 
-var flags = app.Options{}
+var flags = app.Options{Sort: app.Name}
 
 func init() {
 	rootCmd.Flags().StringSliceVarP(&flags.Locations, "locations", "l", nil, "a comma-separated list of locations to display")
-	//rootCmd.Flags().StringVarP(&flags.Sort, "sort", "s", "name", "field to sort the observations by")
+	rootCmd.Flags().VarP(&flags.Sort, "sort", "s", "field to sort the observations by")
 	rootCmd.Flags().BoolVarP(&flags.Reverse, "reverse", "r", false, "print the observations in reverse order")
 }
