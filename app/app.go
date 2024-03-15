@@ -3,8 +3,10 @@ package app
 import (
 	"errors"
 	"fmt"
+	"os"
 	"slices"
 	"strings"
+	"text/tabwriter"
 	"time"
 )
 
@@ -56,8 +58,13 @@ type Station struct {
 	Available bool
 }
 
+// For debugging
 func (s Station) String() string {
-	return fmt.Sprintf("%-17v %4.1f  %v", s.Name, s.UVIndex, s.Time.Format("Mon 2 Jan 3:04 pm"))
+	available := "-"
+	if !s.Available {
+		available = "n/a"
+	}
+	return fmt.Sprintf("%-5v%-18v%-5.1f%-7v%-v", s.Id, s.Name, s.UVIndex, s.Time.Format("15:04"), available)
 }
 
 func Run(options Options) error {
@@ -76,9 +83,7 @@ func Run(options Options) error {
 		slices.Reverse(stations)
 	}
 
-	for _, s := range stations {
-		fmt.Println(s)
-	}
+	show(stations)
 
 	return nil
 }
@@ -133,4 +138,17 @@ func sort(stations []Station, f Field) {
 			return a1 - a2
 		})
 	}
+}
+
+func show(stations []Station) {
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
+	fmt.Fprintln(w, fmt.Sprintf("%v\t%v\t%v\t%v\t%v\t", "Id", "Location", "Index", "Time", "Status"))
+	for _, s := range stations {
+		status := "-"
+		if !s.Available {
+			status = "n/a"
+		}
+		fmt.Fprintln(w, fmt.Sprintf("%v\t%v\t%.1f\t%v\t%v\t", s.Id, s.Name, s.UVIndex, s.Time.Format("15:04"), status))
+	}
+	w.Flush()
 }
