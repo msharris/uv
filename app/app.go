@@ -97,8 +97,8 @@ func Run(options Options) error {
 }
 
 func filter(stations []Station, names []string) []Station {
-	for _, n := range names {
-		strings.ToLower(n)
+	for i := range names {
+		names[i] = strings.ToLower(names[i])
 	}
 
 	var filtered []Station
